@@ -1,3 +1,76 @@
+# LaunchX
+
+## Dependencies
+
+1. "es6-promise": "^4.2.8" - `npm i es6-promise`
+2. "object-assign": "~4.1.0" - `npm i object-assign`
+3. "needle": "3.0.0" - `npm i needle`
+
+#### Documentation of dependencies
+[npm es6-promise](https://www.npmjs.com/package/es6-promise)
+[npm object-assign](https://www.npmjs.com/package/object-assign)
+[npm needle](https://www.npmjs.com/package/needle)
+
+## Main file
+
+`main.js` have all the functions to interact with the trello API
+
+## Convention
+
+`Common JS` is used in this project as extension to the JavaScript scripting language.
+
+## Test Frameworks
+
+For testing this project is using `Mocha` and `Chai`, to install them use: `npm install mocha chai --save-dev` then, you can used them with the command `npm test`
+
+## Test example
+
+```javascript
+// Describe the header of the test
+describe('addBoard', function () { //Test block addBoard Begins
+
+        var query; //Info of the key, token and parameters to interact with the trello apy
+        var post; //Type of HTTP request
+
+
+        beforeEach(function (done) { // is run before each test in the block addBoard 
+            sinon.stub(restler, 'post').callsFake(function (uri, options) { //testing the HTTP request response
+                return {once: function (event, callback) {
+                    callback(null, null);
+                }};
+            });
+
+            trello.addBoard('name', 'description', 'organizationId', function () { //addBoard Function call
+                query = restler.post.args[0][1].query;
+                post = restler.post; // restler hides most of the complexity of creating and using http.Client
+                done();
+            });
+        });
+
+        it('should post to https://api.trello.com/1/boards/', function () { //Test the POST request in the API link https://api.trello.com/1/boards/
+            
+            post.should.have.been.calledWith('https://api.trello.com/1/boards/');
+        });
+
+        it('should include the description', function () { //Test the description added to the Board
+            query.desc.should.equal('description');
+        });
+
+        it('should include the name', function () { // Test the name added to the Board
+            query.name.should.equal('name');
+        });
+
+        it('should include the organization id', function () { //Test the organization added to the Board
+            query.idOrganization.should.equal('organizationId');
+        });
+
+        afterEach(function () { //Restores the Client
+            restler.post.restore();
+        });
+    });
+```
+
+########################################################
 [![Build Status](https://travis-ci.org/norberteder/trello.svg?branch=master)](https://travis-ci.org/norberteder/trello)
 
 # trello
